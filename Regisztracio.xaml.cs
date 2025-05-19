@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Bcpg.Sig;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,10 +37,43 @@ namespace ugyfel
                 MessageBox.Show("Töltsön ki minden mezőt!", "Hiányzó adat!" ,MessageBoxButton.OK,MessageBoxImage.Error);
                 return;
             }
-            if (string.IsNullOrEmpty())
+            if (pass!=passujra)
             {
-
+                MessageBox.Show("Nem eggyezik a két jelszó!", "Eltérő adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+            if (!emailcim.Contains("@") || !emailcim.Contains("."))
+            {
+                MessageBox.Show("Az emailcím nem megfelelő!", "Hibás adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                using (var con = new MySql.Data.MySqlClient.MySqlConnection(App.ConnString))
+                {
+                    con.Open();
+                    string sql = "SELECT count(*) from felhasznalo where felhasznalo=@fnev or email=@emil";
+                    var check = new MySql.Data.MySqlClient.MySqlCommand(sql, con);
+                    check.Parameters.AddWithValue("@fnev", nev);
+                    check.Parameters.AddWithValue("@emil", emailcim);
+                    int count = Convert.ToInt32(check.ExecuteScalar());
+                    if (count > 0)
+                    {
+                        MessageBox.Show("Van ilyen felhasználó név", "Létező adat!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    sql = "INSERT INTO felhasznalo (felhasznalo, jelszo, email) VALUES (@fnev, @jelszo, @emil)";
+
+
+                }
+                    
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Hiba az adatbázis frissítése során:\n" + ex.Message, "Adatbázis hiba!",MessageBoxButton.OK,MessageBoxImage.Error);
+            }
+
         }
     }
 }
