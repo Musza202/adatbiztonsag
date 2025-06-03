@@ -64,6 +64,7 @@ namespace ugyfel
                         return;
                     }
                     sql = "INSERT INTO felhasznalo (felhasznalo, jelszo, email) VALUES (@fnev, @jelszo, @emil)";
+                    MessageBox.Show("Sikeres regisztráció!", "Sikeres adatbevitel!", MessageBoxButton.OK, MessageBoxImage.Information);
 
 
                 }
